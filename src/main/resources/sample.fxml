@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="665.0" prefWidth="1055.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1">
+    <tabs>
+        <Tab text="Task1">
+            <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                    <children>
+                        <BarChart fx:id="chart11" animated="false" layoutX="26.0" layoutY="14.0" legendVisible="false">
+                            <xAxis>
+                                <CategoryAxis side="BOTTOM" tickLabelRotation="90.0" />
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis side="LEFT" />
+                            </yAxis>
+                        </BarChart>
+                        <BarChart fx:id="chart12" animated="false" layoutX="528.0" layoutY="12.0" legendVisible="false">
+                            <xAxis>
+                                <CategoryAxis side="BOTTOM" tickLabelRotation="90.0" />
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis side="LEFT" />
+                            </yAxis>
+                        </BarChart>
+                        <Label fx:id="label11" layoutX="62.0" layoutY="414.0" prefHeight="18.0" prefWidth="456.0" text="Label" />
+                        <Label fx:id="label12" layoutX="566.0" layoutY="415.0" prefHeight="18.0" prefWidth="447.0" text="Label" />
+                    </children>
+                </AnchorPane>
+            </content>
+        </Tab>
+        <Tab text="Task2">
+            <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                    <children>
+                        <BarChart fx:id="chart21" animated="false" layoutX="26.0" layoutY="14.0" legendVisible="false">
+                            <xAxis>
+                                <CategoryAxis side="BOTTOM" tickLabelRotation="90.0" />
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis side="LEFT" />
+                            </yAxis>
+                        </BarChart>
+                        <BarChart fx:id="chart22" animated="false" layoutX="528.0" layoutY="12.0" legendVisible="false">
+                            <xAxis>
+                                <CategoryAxis side="BOTTOM" tickLabelRotation="90.0" />
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis side="LEFT" />
+                            </yAxis>
+                        </BarChart>
+                        <Label fx:id="label21" layoutX="62.0" layoutY="414.0" prefHeight="18.0" prefWidth="456.0" text="Label" />
+                        <Label fx:id="label22" layoutX="566.0" layoutY="415.0" prefHeight="18.0" prefWidth="447.0" text="Label" />
+                    </children>
+                </AnchorPane>
+            </content>
+        </Tab>
+        <Tab text="Task3">
+            <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                    <children>
+                        <BarChart fx:id="chart31" animated="false" layoutX="26.0" layoutY="14.0" legendVisible="false">
+                            <xAxis>
+                                <CategoryAxis side="BOTTOM" tickLabelRotation="90.0" />
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis side="LEFT" />
+                            </yAxis>
+                        </BarChart>
+                        <BarChart fx:id="chart32" animated="false" layoutX="528.0" layoutY="12.0" legendVisible="false">
+                            <xAxis>
+                                <CategoryAxis side="BOTTOM" tickLabelRotation="90.0" />
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis side="LEFT" />
+                            </yAxis>
+                        </BarChart>
+                    </children>
+                </AnchorPane>
+            </content>
+        </Tab>
+    </tabs>
+</TabPane>
