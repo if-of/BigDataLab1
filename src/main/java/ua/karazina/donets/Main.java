@@ -229,22 +229,26 @@ public class Main extends Application {
 
 
     private void addAllToChart(List<Map.Entry<Integer, Integer>> wordLengthCount, String chartSelector) {
+        float max = wordLengthCount.stream().map(entry -> entry.getValue()).mapToInt(Integer::intValue).sum();
+
         BarChart barChart = (BarChart) scene.lookup(chartSelector);
         XYChart.Series<String, Float> series = new XYChart.Series<>();
         wordLengthCount.stream().forEach(entry ->
                 series.getData().add(
-                        new XYChart.Data<>(String.valueOf(entry.getKey()), entry.getValue().floatValue())
+                        new XYChart.Data<>(String.valueOf(entry.getKey()), entry.getValue().floatValue() / max)
                 )
         );
         barChart.getData().addAll(series);
     }
 
     private void addTwentyMostFrequentWordsToChart(List<Map.Entry<String, Integer>> wordsCount, String chartSelector) {
+        float max = wordsCount.stream().map(entry -> entry.getValue()).mapToInt(Integer::intValue).sum();
+
         BarChart barChart = (BarChart) scene.lookup(chartSelector);
         XYChart.Series<String, Float> series = new XYChart.Series<>();
         wordsCount.stream().limit(20).forEach(entry ->
                 series.getData().add(
-                        new XYChart.Data<>(entry.getKey(), entry.getValue().floatValue())
+                        new XYChart.Data<>(entry.getKey(), entry.getValue().floatValue() / max)
                 )
         );
         barChart.getData().addAll(series);
