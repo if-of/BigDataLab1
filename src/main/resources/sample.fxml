@@ -6,7 +6,7 @@
 
 <TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="665.0" prefWidth="1055.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1">
     <tabs>
-        <Tab text="Task1">
+        <Tab text="Lab1:Task1">
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                     <children>
@@ -32,7 +32,7 @@
                 </AnchorPane>
             </content>
         </Tab>
-        <Tab text="Task2">
+        <Tab text="Lab1:Task2">
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                     <children>
@@ -58,7 +58,7 @@
                 </AnchorPane>
             </content>
         </Tab>
-        <Tab text="Task3">
+        <Tab text="Lab1:Task3">
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                     <children>
@@ -78,6 +78,21 @@
                                 <NumberAxis side="LEFT" />
                             </yAxis>
                         </BarChart>
+                    </children>
+                </AnchorPane>
+            </content>
+        </Tab>
+        <Tab text="Lab2">
+            <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                    <children>
+                        <Label layoutX="14.0" layoutY="12.0" text="Путь к файлу с выборкой" />
+                        <TextField fx:id="lab2FilePath" layoutX="196.0" layoutY="10.0" prefHeight="25.0" prefWidth="262.0" />
+                  <TextArea fx:id="lab2TextArea" layoutX="196.0" layoutY="44.0" prefHeight="200.0" prefWidth="845.0" />
+                  <Label layoutX="14.0" layoutY="43.0" text="Текст для анализа" />
+                  <Button fx:id="lab2Calculate" layoutX="196.0" layoutY="254.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="124.0" text="Расчитать" />
+                  <Label layoutX="14.0" layoutY="310.0" text="Вероятность спама" />
+                  <TextField fx:id="lab2SpamProbability" disable="true" editable="false" layoutX="194.0" layoutY="306.0" />
                     </children>
                 </AnchorPane>
             </content>
