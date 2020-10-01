@@ -57,7 +57,7 @@ public class Main extends Application {
         lab2();
     }
 
-    private void lab1(){
+    private void lab1() {
         Data data = TextLoader.loadData(new File("sms-spam-corpus.csv"));
 
         //processing of messages
@@ -117,10 +117,10 @@ public class Main extends Application {
             Map<String, Integer> spamsFrequency = calculateWordsFrequencyMap(spamMessages);
 
             long countOfAbsentWordsHam = wordsOfMessage.stream()
-                    .filter(key -> hamsFrequency.containsKey(key))
+                    .filter(key -> !hamsFrequency.containsKey(key))
                     .count();
             long countOfAbsentWordsSpam = wordsOfMessage.stream()
-                    .filter(key -> spamsFrequency.containsKey(key))
+                    .filter(key -> !spamsFrequency.containsKey(key))
                     .count();
 
             double PbodyHam = wordsOfMessage.stream()
