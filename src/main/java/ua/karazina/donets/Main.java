@@ -6,19 +6,29 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import ua.karazina.donets.service.Stemmer;
-import ua.karazina.donets.utils.ResourceUtils;
+import ua.karazina.donets.model.Data;
+import ua.karazina.donets.service.TextLoader;
+import ua.karazina.donets.service.TextProcessor;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Objects;
+
+import static ua.karazina.donets.service.TextProcessor.mapMessagesToWords;
+import static ua.karazina.donets.service.TextStatistic.calculateAverageMessageLength;
+import static ua.karazina.donets.service.TextStatistic.calculateAverageWordLength;
+import static ua.karazina.donets.service.TextStatistic.calculateMessagesLengthCount;
+import static ua.karazina.donets.service.TextStatistic.calculateWordsFrequency;
+import static ua.karazina.donets.service.TextStatistic.calculateWordsFrequencyMap;
+import static ua.karazina.donets.service.TextStatistic.calculateWordsLengthCount;
 
 public class Main extends Application {
 
@@ -43,118 +53,11 @@ public class Main extends Application {
     }
 
     private void mainLogic() {
-        String wholeFile = ResourceUtils.readFileFromResourceAsString("sms-spam-corpus.csv");
-        String[] lines = wholeFile.split("\\R*,,,\\R*");
-
-        /**
-         * splitting messages into 2 categories
-         */
-        List<String> hams = new ArrayList<>();
-        List<String> spams = new ArrayList<>();
-        for (int i = 1; i < lines.length; i++) {
-            if (lines[i].startsWith("ham,")) {
-                hams.add(lines[i].substring(4));
-            } else if (lines[i].startsWith("spam,")) {
-                spams.add(lines[i].substring(5));
-            } else {
-                throw new RuntimeException("Unexpecting category: " + lines[i]);
-            }
-        }
-
-
-        /**
-         * processing of messages
-         */
-        List<String> processedHams = processMessages(hams);
-        List<String> processedSpams = processMessages(spams);
-
-
-        /**
-         * calculating frequency of words
-         */
-        List<Map.Entry<String, Integer>> hamsFrequency = calculateFrequency(processedHams);
-        List<Map.Entry<String, Integer>> spamsFrequency = calculateFrequency(processedSpams);
-
-        /**
-         * saving frequency of words
-         */
-        saveSortedByFrequency(hamsFrequency, "hams.txt");
-        saveSortedByFrequency(spamsFrequency, "spams.txt");
-
-
-        /**
-         * task 1
-         */
-        addAllToChart(calculateWordLengthCount(processedHams), "#chart11");
-        addAllToChart(calculateWordLengthCount(processedSpams), "#chart12");
-        Label label11 = (Label) scene.lookup("#label11");
-        Label label12 = (Label) scene.lookup("#label12");
-        label11.setText("average word length for hams : " + calculateAverageWordLength(processedHams));
-        label12.setText("average word length for spams: " + calculateAverageWordLength(processedSpams));
-
-
-        /**
-         * task 2
-         */
-        addAllToChart(calculateMessageLengthCount(processedHams), "#chart21");
-        addAllToChart(calculateMessageLengthCount(processedSpams), "#chart22");
-        Label label21 = (Label) scene.lookup("#label21");
-        Label label22 = (Label) scene.lookup("#label22");
-        label21.setText("average message length for hams : " + calculateAverageMessageLength(processedHams));
-        label22.setText("average message length for spams: " + calculateAverageMessageLength(processedSpams));
-
-
-        /**
-         * task 3
-         */
-        addTwentyMostFrequentWordsToChart(hamsFrequency, "#chart31");
-        addTwentyMostFrequentWordsToChart(spamsFrequency, "#chart32");
+        lab1();
+        lab2();
     }
 
-    private static List<String> processMessages(List<String> strings) {
-        return strings.stream()
-                .map(s -> s.replaceAll("[^a-zA-Z\\s]", ""))
-                .map(String::toLowerCase)
-                .map(Main::removeStopWords)
-                .map(Main::stem)
-                .map(String::trim)
-                .map(s -> s.replaceAll("\\s++", " "))
-                .collect(Collectors.toList());
-    }
-
-    private static String removeStopWords(String string) {
-        String[] STOP_WORDS = {"a", "the", "to", "in"};
-        String SPACES = "\\h++";
-
-        for (String stopWord : STOP_WORDS) {
-            string = string.replaceAll(SPACES + stopWord + SPACES, " ");
-        }
-        return string;
-    }
-
-    private static String stem(String string) {
-        return Arrays.stream(string.split("\\h++"))
-                .map(word -> new Stemmer().stem(word))
-                .collect(Collectors.joining(" "));
-    }
-
-
-    private static List<Map.Entry<String, Integer>> calculateFrequency(List<String> stringList) {
-        Map<String, Integer> frequency = new HashMap<>();
-
-        stringList.stream()
-                .map(s -> s.split("\\h"))
-                .flatMap(Arrays::stream)
-                .forEach(word ->
-                        frequency.compute(word, (k, v) -> (v == null) ? 1 : v + 1)
-                );
-
-        List<Map.Entry<String, Integer>> list = new ArrayList<>(frequency.entrySet());
-        list.sort(Map.Entry.<String, Integer>comparingByValue().reversed());
-        return list;
-    }
-
-    private static void saveSortedByFrequency(List<Map.Entry<String, Integer>> wordCount, String fileName) {
+    private void saveSortedByFrequency(List<Map.Entry<String, Integer>> wordCount, String fileName) {
         try (PrintWriter printWriter = new PrintWriter(fileName)) {
             wordCount.forEach(entry ->
                     printWriter.println(entry.getKey() + " : " + entry.getValue()));
@@ -163,70 +66,96 @@ public class Main extends Application {
         }
     }
 
+    private void lab1(){
+        Data data = TextLoader.loadData(new File("sms-spam-corpus.csv"));
 
-    private static List<Map.Entry<Integer, Integer>> calculateWordLengthCount(List<String> stringList) {
-        Map<Integer, Integer> lengthCount = new HashMap<>();
+        //processing of messages
+        List<String> hamMessages = TextProcessor.processText(data.getHamMessages());
+        List<String> spamMessages = TextProcessor.processText(data.getSpamMessages());
 
-        stringList.stream()
-                .map(s -> s.split("\\h"))
-                .flatMap(Arrays::stream)
-                .map(String::length)
-                .forEach(length ->
-                        lengthCount.compute(length, (k, v) -> (v == null) ? 1 : v + 1));
+        // calculating frequency of words
+        List<Map.Entry<String, Integer>> hamsFrequency = calculateWordsFrequency(hamMessages);
+        List<Map.Entry<String, Integer>> spamsFrequency = calculateWordsFrequency(spamMessages);
 
-        List<Map.Entry<Integer, Integer>> list = new ArrayList<>(lengthCount.entrySet());
-        list.sort(Map.Entry.comparingByKey());
-        return list;
+        // saving frequency of words
+        saveSortedByFrequency(hamsFrequency, "hams.txt");
+        saveSortedByFrequency(spamsFrequency, "spams.txt");
+
+        // task 1
+        addAllToChart(calculateWordsLengthCount(hamMessages), "#chart11");
+        addAllToChart(calculateWordsLengthCount(spamMessages), "#chart12");
+        Label label11 = (Label) scene.lookup("#label11");
+        Label label12 = (Label) scene.lookup("#label12");
+        label11.setText("average word length for hams : " + calculateAverageWordLength(hamMessages));
+        label12.setText("average word length for spams: " + calculateAverageWordLength(spamMessages));
+
+        // task 2
+        addAllToChart(calculateMessagesLengthCount(hamMessages), "#chart21");
+        addAllToChart(calculateMessagesLengthCount(spamMessages), "#chart22");
+        Label label21 = (Label) scene.lookup("#label21");
+        Label label22 = (Label) scene.lookup("#label22");
+        label21.setText("average message length for hams : " + calculateAverageMessageLength(hamMessages));
+        label22.setText("average message length for spams: " + calculateAverageMessageLength(spamMessages));
+
+        // task 3
+        addTwentyMostFrequentWordsToChart(hamsFrequency, "#chart31");
+        addTwentyMostFrequentWordsToChart(spamsFrequency, "#chart32");
     }
 
-    private static double calculateAverageWordLength(List<String> stringList) {
-        double totalLength = 0;
-        double count = 0;
+    private void lab2() {
+        TextField lab2FilePath = (TextField) scene.lookup("#lab2FilePath");
+        TextArea lab2TextArea = (TextArea) scene.lookup("#lab2TextArea");
+        Button calculateButton = (Button) scene.lookup("#lab2Calculate");
 
-        List<Integer> lengths = stringList.stream()
-                .map(s -> s.split("\\h"))
-                .flatMap(Arrays::stream)
-                .map(String::length)
-                .collect(Collectors.toList());
+        TextField lab2SpamProbability = (TextField) scene.lookup("#lab2SpamProbability");
+        TextField lab2HamProbability = (TextField) scene.lookup("#lab2HamProbability");
 
-        for (Integer length : lengths) {
-            count++;
-            totalLength += length;
-        }
+        calculateButton.setOnMouseClicked(event -> {
+            Data l2data = TextLoader.loadData(new File(lab2FilePath.getText()));
+            List<String> l2hamMessages = TextProcessor.processText(l2data.getHamMessages());
+            List<String> l2spamMessages = TextProcessor.processText(l2data.getSpamMessages());
 
-        return totalLength / count;
+            int countHamWords = mapMessagesToWords(l2hamMessages).size();
+            int countSpamWords = mapMessagesToWords(l2spamMessages).size();
+
+            double Pham = (double) countHamWords / (countHamWords + countSpamWords);
+            double Pspam = (double) countSpamWords / (countHamWords + countSpamWords);
+
+            List<String> wordsOfMessage = mapMessagesToWords(TextProcessor.processMessage(lab2TextArea.getText()));
+
+
+            Map<String, Integer> l2hamsFrequency = calculateWordsFrequencyMap(l2hamMessages);
+            Map<String, Integer> l2spamsFrequency = calculateWordsFrequencyMap(l2spamMessages);
+
+
+            long countOfAbsentWordsHam = wordsOfMessage.stream()
+                    .filter(key -> l2hamsFrequency.containsKey(key))
+                    .count();
+            long countOfAbsentWordsSpam = wordsOfMessage.stream()
+                    .filter(key -> l2spamsFrequency.containsKey(key))
+                    .count();
+
+            double PbodyHam = wordsOfMessage.stream()
+                    .map(word -> l2hamsFrequency.get(word))
+                    .filter(Objects::nonNull)
+                    .map(value -> value + 1)
+                    .mapToDouble(value -> (double) value / (countHamWords + countOfAbsentWordsHam))
+                    .reduce(1, (a, b) -> a * b);
+
+            double PbodySpam = wordsOfMessage.stream()
+                    .map(word -> l2spamsFrequency.get(word))
+                    .filter(Objects::nonNull)
+                    .map(value -> value + 1)
+                    .mapToDouble(value -> (double) value / (countSpamWords + countOfAbsentWordsSpam))
+                    .reduce(1, (a, b) -> a * b);
+
+            double hamResult = Pham * PbodyHam;
+            double spamResult = Pspam * PbodySpam;
+
+            lab2HamProbability.setText(String.valueOf(hamResult));
+            lab2SpamProbability.setText(String.valueOf(spamResult));
+        });
     }
-
-
-    private static List<Map.Entry<Integer, Integer>> calculateMessageLengthCount(List<String> stringList) {
-        Map<Integer, Integer> lengthCount = new HashMap<>();
-
-        stringList.stream()
-                .map(String::length)
-                .forEach(length ->
-                        lengthCount.compute(length, (k, v) -> (v == null) ? 1 : v + 1));
-
-        List<Map.Entry<Integer, Integer>> list = new ArrayList<>(lengthCount.entrySet());
-        list.sort(Map.Entry.comparingByKey());
-        return list;
-    }
-
-    private static double calculateAverageMessageLength(List<String> stringList) {
-        double totalLength = 0;
-        double count = 0;
-
-        List<Integer> lengths = stringList.stream()
-                .map(String::length)
-                .collect(Collectors.toList());
-
-        for (Integer length : lengths) {
-            count++;
-            totalLength += length;
-        }
-
-        return totalLength / count;
-    }
-
 
     private void addAllToChart(List<Map.Entry<Integer, Integer>> wordLengthCount, String chartSelector) {
         float max = wordLengthCount.stream().map(entry -> entry.getValue()).mapToInt(Integer::intValue).sum();
