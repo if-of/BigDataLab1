@@ -57,21 +57,12 @@ public class Main extends Application {
         lab2();
     }
 
-    private void saveSortedByFrequency(List<Map.Entry<String, Integer>> wordCount, String fileName) {
-        try (PrintWriter printWriter = new PrintWriter(fileName)) {
-            wordCount.forEach(entry ->
-                    printWriter.println(entry.getKey() + " : " + entry.getValue()));
-        } catch (IOException e) {
-            throw new RuntimeException("Something wrong with saving file with fileName: " + fileName, e);
-        }
-    }
-
     private void lab1(){
         Data data = TextLoader.loadData(new File("sms-spam-corpus.csv"));
 
         //processing of messages
-        List<String> hamMessages = TextProcessor.processText(data.getHamMessages());
-        List<String> spamMessages = TextProcessor.processText(data.getSpamMessages());
+        List<String> hamMessages = TextProcessor.processMessages(data.getHamMessages());
+        List<String> spamMessages = TextProcessor.processMessages(data.getSpamMessages());
 
         // calculating frequency of words
         List<Map.Entry<String, Integer>> hamsFrequency = calculateWordsFrequency(hamMessages);
@@ -103,47 +94,43 @@ public class Main extends Application {
     }
 
     private void lab2() {
-        TextField lab2FilePath = (TextField) scene.lookup("#lab2FilePath");
-        TextArea lab2TextArea = (TextArea) scene.lookup("#lab2TextArea");
+        TextField filePathField = (TextField) scene.lookup("#lab2FilePath");
+        TextArea textArea = (TextArea) scene.lookup("#lab2TextArea");
         Button calculateButton = (Button) scene.lookup("#lab2Calculate");
-
-        TextField lab2SpamProbability = (TextField) scene.lookup("#lab2SpamProbability");
-        TextField lab2HamProbability = (TextField) scene.lookup("#lab2HamProbability");
+        TextField spamProbabilityField = (TextField) scene.lookup("#lab2SpamProbability");
+        TextField hamProbabilityField = (TextField) scene.lookup("#lab2HamProbability");
 
         calculateButton.setOnMouseClicked(event -> {
-            Data l2data = TextLoader.loadData(new File(lab2FilePath.getText()));
-            List<String> l2hamMessages = TextProcessor.processText(l2data.getHamMessages());
-            List<String> l2spamMessages = TextProcessor.processText(l2data.getSpamMessages());
+            Data data = TextLoader.loadData(new File(filePathField.getText()));
+            List<String> hamMessages = TextProcessor.processMessages(data.getHamMessages());
+            List<String> spamMessages = TextProcessor.processMessages(data.getSpamMessages());
 
-            int countHamWords = mapMessagesToWords(l2hamMessages).size();
-            int countSpamWords = mapMessagesToWords(l2spamMessages).size();
+            int countHamWords = mapMessagesToWords(hamMessages).size();
+            int countSpamWords = mapMessagesToWords(spamMessages).size();
 
             double Pham = (double) countHamWords / (countHamWords + countSpamWords);
             double Pspam = (double) countSpamWords / (countHamWords + countSpamWords);
 
-            List<String> wordsOfMessage = mapMessagesToWords(TextProcessor.processMessage(lab2TextArea.getText()));
+            List<String> wordsOfMessage = mapMessagesToWords(TextProcessor.processMessage(textArea.getText()));
 
-
-            Map<String, Integer> l2hamsFrequency = calculateWordsFrequencyMap(l2hamMessages);
-            Map<String, Integer> l2spamsFrequency = calculateWordsFrequencyMap(l2spamMessages);
-
+            Map<String, Integer> hamsFrequency = calculateWordsFrequencyMap(hamMessages);
+            Map<String, Integer> spamsFrequency = calculateWordsFrequencyMap(spamMessages);
 
             long countOfAbsentWordsHam = wordsOfMessage.stream()
-                    .filter(key -> l2hamsFrequency.containsKey(key))
+                    .filter(key -> hamsFrequency.containsKey(key))
                     .count();
             long countOfAbsentWordsSpam = wordsOfMessage.stream()
-                    .filter(key -> l2spamsFrequency.containsKey(key))
+                    .filter(key -> spamsFrequency.containsKey(key))
                     .count();
 
             double PbodyHam = wordsOfMessage.stream()
-                    .map(word -> l2hamsFrequency.get(word))
+                    .map(hamsFrequency::get)
                     .filter(Objects::nonNull)
                     .map(value -> value + 1)
                     .mapToDouble(value -> (double) value / (countHamWords + countOfAbsentWordsHam))
                     .reduce(1, (a, b) -> a * b);
-
             double PbodySpam = wordsOfMessage.stream()
-                    .map(word -> l2spamsFrequency.get(word))
+                    .map(spamsFrequency::get)
                     .filter(Objects::nonNull)
                     .map(value -> value + 1)
                     .mapToDouble(value -> (double) value / (countSpamWords + countOfAbsentWordsSpam))
@@ -152,9 +139,19 @@ public class Main extends Application {
             double hamResult = Pham * PbodyHam;
             double spamResult = Pspam * PbodySpam;
 
-            lab2HamProbability.setText(String.valueOf(hamResult));
-            lab2SpamProbability.setText(String.valueOf(spamResult));
+            hamProbabilityField.setText(String.valueOf(hamResult));
+            spamProbabilityField.setText(String.valueOf(spamResult));
         });
+    }
+
+
+    private void saveSortedByFrequency(List<Map.Entry<String, Integer>> wordCount, String fileName) {
+        try (PrintWriter printWriter = new PrintWriter(fileName)) {
+            wordCount.forEach(entry ->
+                    printWriter.println(entry.getKey() + " : " + entry.getValue()));
+        } catch (IOException e) {
+            throw new RuntimeException("Something wrong with saving file with fileName: " + fileName, e);
+        }
     }
 
     private void addAllToChart(List<Map.Entry<Integer, Integer>> wordLengthCount, String chartSelector) {

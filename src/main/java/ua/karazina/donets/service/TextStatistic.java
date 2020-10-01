@@ -9,10 +9,10 @@ import java.util.stream.Collectors;
 
 public class TextStatistic {
 
-    public static List<Map.Entry<String, Integer>> calculateWordsFrequency(List<String> stringList) {
+    public static List<Map.Entry<String, Integer>> calculateWordsFrequency(List<String> messageList) {
         Map<String, Integer> frequency = new HashMap<>();
 
-        stringList.stream()
+        messageList.stream()
                 .map(s -> s.split("\\h"))
                 .flatMap(Arrays::stream)
                 .forEach(word ->
@@ -24,10 +24,10 @@ public class TextStatistic {
         return list;
     }
 
-    public static Map<String, Integer> calculateWordsFrequencyMap(List<String> stringList) {
+    public static Map<String, Integer> calculateWordsFrequencyMap(List<String> messageList) {
         Map<String, Integer> frequency = new HashMap<>();
 
-        stringList.stream()
+        messageList.stream()
                 .map(s -> s.split("\\h"))
                 .flatMap(Arrays::stream)
                 .forEach(word ->
@@ -38,10 +38,10 @@ public class TextStatistic {
     }
 
 
-    public static List<Map.Entry<Integer, Integer>> calculateWordsLengthCount(List<String> stringList) {
+    public static List<Map.Entry<Integer, Integer>> calculateWordsLengthCount(List<String> messageList) {
         Map<Integer, Integer> lengthCount = new HashMap<>();
 
-        stringList.stream()
+        messageList.stream()
                 .map(s -> s.split("\\h"))
                 .flatMap(Arrays::stream)
                 .map(String::length)
@@ -53,10 +53,10 @@ public class TextStatistic {
         return list;
     }
 
-    public static List<Map.Entry<Integer, Integer>> calculateMessagesLengthCount(List<String> stringList) {
+    public static List<Map.Entry<Integer, Integer>> calculateMessagesLengthCount(List<String> messageList) {
         Map<Integer, Integer> lengthCount = new HashMap<>();
 
-        stringList.stream()
+        messageList.stream()
                 .map(String::length)
                 .forEach(length ->
                         lengthCount.compute(length, (k, v) -> (v == null) ? 1 : v + 1));
@@ -67,8 +67,8 @@ public class TextStatistic {
     }
 
 
-    public static double calculateAverageWordLength(List<String> stringList) {
-        List<String> wordList = stringList.stream()
+    public static double calculateAverageWordLength(List<String> messageList) {
+        List<String> wordList = messageList.stream()
                 .map(s -> s.split("\\h"))
                 .flatMap(Arrays::stream)
                 .collect(Collectors.toList());
@@ -76,11 +76,11 @@ public class TextStatistic {
         return calculateAverageMessageLength(wordList);
     }
 
-    public static double calculateAverageMessageLength(List<String> stringList) {
+    public static double calculateAverageMessageLength(List<String> messageList) {
         double totalLength = 0;
         double count = 0;
 
-        List<Integer> lengths = stringList.stream()
+        List<Integer> lengths = messageList.stream()
                 .map(String::length)
                 .collect(Collectors.toList());
 

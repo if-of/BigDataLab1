@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 public class TextProcessor {
 
-    public static List<String> processText(List<String> strings) {
+    public static List<String> processMessages(List<String> strings) {
         return strings.stream()
                 .map(s -> s.replaceAll("[^a-zA-Z\\s]", ""))
                 .map(String::toLowerCase)
@@ -19,7 +19,7 @@ public class TextProcessor {
     }
 
     public static List<String> processMessage(String message) {
-        return processText(Collections.singletonList(message));
+        return processMessages(Collections.singletonList(message));
     }
 
     public static List<String> mapMessagesToWords(List<String> strings) {
